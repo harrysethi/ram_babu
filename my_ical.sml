@@ -1,4 +1,5 @@
 (*----------------------------------------------------------------------*)
+use "fileIO.sml";
 
 signature MY_ICAL = 
 sig
@@ -19,18 +20,6 @@ struct
 
         open String;
 
-        (*
-        fun chk_ifCharSame a b = 
-                if (a = b) then true
-                else false;
-
-        val chk_semicolon = chk_ifCharSame #";";
-        val chk_colon = chk_ifCharSame #":";
-        *)
-        
-                
-                
-                
         fun chk_ifCharSame (a:char, b:char) = 
                 if (a = b) then true
                 else false;
@@ -173,14 +162,6 @@ struct
                         end;
        
         
-                                
-        
-        (*fun getKey ("",_) = ("","")
-                | getKey (name, keyword) = 
-                        if (compare(name,keyword) = EQUAL) then
-                                (name ^ "-" ^ "param", name ^ "-" ^ "value") 
-                        else
-                                ("", "");*)
         fun readFile (filename:string) = 
                 FileIO.readLines (filename);                       
                                 
