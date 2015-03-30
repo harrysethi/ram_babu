@@ -25,6 +25,17 @@ sig
         UID_value:string, X_MOZ_GENERATION_param:string,
         X_MOZ_GENERATION_value:string} list -> unit
         
+        val reclist2ical : {CLASS_param:string, CLASS_value:string, CREATED_param:string,
+        CREATED_value:string, DESCRIPTION_param:string,
+        DESCRIPTION_value:string, DTEND_param:string, DTEND_value:string,
+        DTSTAMP_param:string, DTSTAMP_value:string, DTSTART_param:string,
+        DTSTART_value:string, LAST_MODIFIED_param:string,
+        LAST_MODIFIED_value:string, LOCATION_param:string,
+        LOCATION_value:string, SEQUENCE_param:string, SEQUENCE_value:string,
+        SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
+        UID_value:string, X_MOZ_GENERATION_param:string,
+        X_MOZ_GENERATION_value:string} list -> unit
+        
         val ical2csv : string -> unit
         
        
@@ -34,6 +45,38 @@ structure My_ICAL: MY_ICAL =
 struct
 
         open String;
+        
+         (*------------------------------------- reclist2ical -------------------------*)
+         
+         fun getParam ("") = ""
+                | getParam (param) = 
+                        ";" ^ param
+                        
+         fun getPropValue ("") = ""
+                | getPropValue (propValue) = 
+                        ":" ^ propValue
+         
+         fun rec2string ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}) = 
+                let 
+                        val _dtStartParam = getParam dtStartParam;
+                in
+                end;
+                "BEGIN:VEVENT"::"DTSTART"::"DTEND"::"DTSTAMP"::"SEQUENCE"::"SUMMARY"::"LOCATION"::"UID"::"CREATED"::"LAST_MODIFIED"
+                ::"CLASS"::"X_MOZ_GENERATION":::"DESCRIPTION"::"END:VEVENT"
+         
+          fun reclist2ical_helper ([]) = []
+                | reclist2ical_helper (h::t) = 
+                        (rec2Fields h) :: "END:VCALENDAR"
+                | reclist2ical_helper (h::t) = 
+                        (rec2Fields h) :: (reclist2ical_helper t);
+         
+         fun reclist2ical [] = []
+                | reclist2ical (L) = 
+                        let
+                                val to_be_written_ics = "BEGIN:VCALENDAR"::"VERSION:2.0"::"PRODID:-//SabreDAV//SabreDAV 1.7.6//EN"::"CALSCALE:GREGORIAN"::(reclist2ical_helper L);
+                        in
+                                FileIO.writeLines("my_cal.ics", to_be_written_ics)
+                        end;
         
         (*------------------------------------- reclist2csv -------------------------*)
         
@@ -130,7 +173,7 @@ struct
               
                                 
         fun create_record [] =  {DTSTART_param="", DTSTART_value="", DTEND_param="", DTEND_value="", DTSTAMP_param="", DTSTAMP_value="", SEQUENCE_param="", SEQUENCE_value="", SUMMARY_param="", SUMMARY_value="", LOCATION_param="", LOCATION_value="", UID_param="", UID_value="", CREATED_param="", CREATED_value="", LAST_MODIFIED_param="", LAST_MODIFIED_value="", CLASS_param="", CLASS_value="", X_MOZ_GENERATION_param="", X_MOZ_GENERATION_value="", DESCRIPTION_param="", DESCRIPTION_value=""} 
-                |  create_record (L) =
+                |  create_record (L) = 
                         let
                                 val (dtStartParam, dtStartVal) = getValues(L,"DTSTART");
                                 val (dtEndParam, dtEndVal) = getValues(L,"DTEND");
