@@ -16,17 +16,9 @@ process_ical2reclist(["dwdwdwadwad","BEGIN:VEVENT","UID:98b0dfee46","LAST-MODIFI
 
 
 
-
-
-
-
-
-
-signature MY_ICAL = 
-sig
-	val ical2reclist : string -> list
-	val csv2reclist : string -> list
-	val reclist2ical : list -> unit
-	val reclist2csv : list -> unit
-	val ical2csv : string -> unit
-end  (* sig ICAL *)
+fun ical2ical (filename:string) = 
+                let
+                        val recList = My_ICAL.ical2reclist filename;
+                in
+                        My_ICAL.reclist2ical recList
+                end;

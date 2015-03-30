@@ -50,30 +50,55 @@ struct
          
          fun getParam ("") = ""
                 | getParam (param) = 
-                        ";" ^ param
+                        ";" ^ param;
                         
          fun getPropValue ("") = ""
                 | getPropValue (propValue) = 
-                        ":" ^ propValue
-         
-         fun rec2string ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}) = 
+                        ":" ^ propValue;
+                        
+         fun getLineString (keyword,param,value,L) = 
                 let 
-                        val _dtStartParam = getParam dtStartParam;
+                        val t_param = getParam param;
+                        val t_value = getPropValue value;
                 in
+                        if (compare(t_value,"") = EQUAL) then
+                                L
+                        else if (compare(t_param,"") = EQUAL) then
+                                (keyword ^ t_value) :: L
+                        else 
+                                (keyword ^ t_param ^ t_value) :: L
+                end;        
+                        
+         
+         fun rec2Fields ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}, outputList) = 
+                let 
+                        val L1 = "BEGIN:VEVENT"::outputList;
+                        val L2 = getLineString ("DTSTART",dtStartParam,dtStartVal,L1);
+                        val L3 = getLineString ("DTEND",dtEndParam,dtEndVal,L2);
+                        val L4 = getLineString ("DTSTAMP",dtStampParam,dtStampVal,L3);
+                        val L5 = getLineString ("SEQUENCE",sequenceParam,sequenceVal,L4);
+                        val L6 = getLineString ("SUMMARY",summaryParam,summaryVal,L5);
+                        val L7 = getLineString ("LOCATION",locationParam,locationVal,L6);
+                        val L8 = getLineString ("UID",uidParam,uidVal,L7);
+                        val L9 = getLineString ("CREATED",createdParam,createdVal,L8);
+                        val L10 = getLineString ("LAST-MODIFIED",lastModifiedParam,lastModifiedVal,L9);
+                        val L11 = getLineString ("CLASS",classParam,classVal,L10);
+                        val L12 = getLineString ("X-MOZ-GENERATION",xmozParam,xmozVal,L11);
+                        val L_final = getLineString ("DESCRIPTION",descParam,descVal,L12);
+                in
+                        "END:VEVENT"::L_final
                 end;
-                "BEGIN:VEVENT"::"DTSTART"::"DTEND"::"DTSTAMP"::"SEQUENCE"::"SUMMARY"::"LOCATION"::"UID"::"CREATED"::"LAST_MODIFIED"
-                ::"CLASS"::"X_MOZ_GENERATION":::"DESCRIPTION"::"END:VEVENT"
          
-          fun reclist2ical_helper ([]) = []
-                | reclist2ical_helper (h::t) = 
-                        (rec2Fields h) :: "END:VCALENDAR"
-                | reclist2ical_helper (h::t) = 
-                        (rec2Fields h) :: (reclist2ical_helper t);
+          fun reclist2ical_helper ([],_) = []
+                | reclist2ical_helper (h::[], outputList) = 
+                        rev( "END:VCALENDAR" :: (rec2Fields(h, outputList)) )
+                | reclist2ical_helper (h::t, outputList) = 
+                        ( reclist2ical_helper (t,(rec2Fields (h,outputList))) );
          
-         fun reclist2ical [] = []
+         fun reclist2ical [] = ()
                 | reclist2ical (L) = 
                         let
-                                val to_be_written_ics = "BEGIN:VCALENDAR"::"VERSION:2.0"::"PRODID:-//SabreDAV//SabreDAV 1.7.6//EN"::"CALSCALE:GREGORIAN"::(reclist2ical_helper L);
+                                val to_be_written_ics = "BEGIN:VCALENDAR"::"VERSION:2.0"::"PRODID:-//SabreDAV//SabreDAV 1.7.6//EN"::"CALSCALE:GREGORIAN"::(reclist2ical_helper (L,[]));
                         in
                                 FileIO.writeLines("my_cal.ics", to_be_written_ics)
                         end;
@@ -262,6 +287,14 @@ struct
                         val recList = ical2reclist filename;
                 in
                         reclist2csv recList
+                end;
+                
+       
+       fun ical2ical (filename:string) = 
+                let
+                        val recList = ical2reclist filename;
+                in
+                        reclist2ical recList
                 end;
 		   
 
