@@ -13,12 +13,52 @@ sig
         SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
         UID_value:string, X_MOZ_GENERATION_param:string,
         X_MOZ_GENERATION_value:string} list
+        
+        val reclist2csv : {CLASS_param:string, CLASS_value:string, CREATED_param:string,
+        CREATED_value:string, DESCRIPTION_param:string,
+        DESCRIPTION_value:string, DTEND_param:string, DTEND_value:string,
+        DTSTAMP_param:string, DTSTAMP_value:string, DTSTART_param:string,
+        DTSTART_value:string, LAST_MODIFIED_param:string,
+        LAST_MODIFIED_value:string, LOCATION_param:string,
+        LOCATION_value:string, SEQUENCE_param:string, SEQUENCE_value:string,
+        SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
+        UID_value:string, X_MOZ_GENERATION_param:string,
+        X_MOZ_GENERATION_value:string} list -> unit
+        
+        val ical2csv : string -> unit
+        
+       
 end  (* sig ICAL *)
 
 structure My_ICAL: MY_ICAL =
 struct
 
         open String;
+        
+        (*------------------------------------- reclist2csv -------------------------*)
+        
+        (*String separator*)
+        val ss =  "\"" ^ "," ^ "\"";
+
+        fun rec2string ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}) = 
+                ("\"" ^ classParam ^ ss ^ classVal ^ ss ^ createdParam ^ ss ^ createdVal ^ ss ^ descParam ^ ss ^ descVal ^ ss ^ dtEndParam ^ ss ^ dtEndVal ^ ss ^ dtStampParam ^ ss ^ dtStampVal ^ ss ^ dtStartParam ^ ss ^ dtStartVal ^ ss ^ lastModifiedParam ^ ss ^ lastModifiedVal ^ ss ^ locationParam ^ ss ^ locationVal ^ ss ^ sequenceParam ^ ss ^ sequenceVal ^ ss ^ summaryParam ^ ss ^ summaryVal ^ ss ^ uidParam ^ ss ^ uidVal ^ ss ^ xmozParam ^ ss ^ xmozVal ^ "\"");
+        
+        fun reclist2csv_helper ([]) = []
+                | reclist2csv_helper (h::t) = 
+                        (rec2string h) :: (reclist2csv_helper t);
+        
+        fun reclist2csv ([]) = ()
+        | reclist2csv (L) = 
+                let 
+                        val listOfString = ("\"CLASS-param\",\"CLASS-value\",\"CREATED-param\",\"CREATED-value\",\"DESCRIPTION-param\",\"DESCRIPTION-value\",\"DTEND-param\",\"DTEND-value\",\"DTSTAMP-param\",\"DTSTAMP-value\",\"DTSTART-param\",\"DTSTART-value\",\"LAST-MODIFIED-param\",\"LAST-MODIFIED-value\",\"LOCATION-param\",\"LOCATION-value\",\"SEQUENCE-param\",\"SEQUENCE-value\",\"SUMMARY-param\",\"SUMMARY-value\",\"UID-param\",\"UID-value\",\"X-MOZ-GENERATION-param\",\"X-MOZ-GENERATION-value\"") :: (reclist2csv_helper L);
+                in
+                        FileIO.writeLines("my_cal.csv", listOfString)
+                end;
+                
+                        
+        
+        
+        (*------------------------------------- ical2reclist -------------------------*)
 
         fun chk_ifCharSame (a:char, b:char) = 
                 if (a = b) then true
@@ -171,6 +211,15 @@ struct
 		in 
 		        process_ical2reclist inputList
 		end;
+		
+        
+        (*------------------------------------- ical2csv -------------------------*)
+        fun ical2csv (filename:string) = 
+                let
+                        val recList = ical2reclist filename;
+                in
+                        reclist2csv recList
+                end;
 		   
 
 end

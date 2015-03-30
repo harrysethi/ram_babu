@@ -135,7 +135,7 @@ fun write (filename: string, s) =
 (* writing a single string terminated by newline into a text file *)
 fun writeLine (filename: string, s) = 
     let val f =  TextIO.openOut filename
-    in  (TextIO.output (f, s^"\n"); TextIO.closeOut f) 
+    in  (TextIO.output (f, s^"\r\n"); TextIO.closeOut f) 
     end
 
 (* the perl function join *)
@@ -145,7 +145,7 @@ fun join (glue, []) = ""
 
 (* writing a string list into a file *)
 fun writeLines (filename: string, sl) =
-    let val ss =  join ("\n", sl)
+    let val ss =  join ("\r\n", sl)
     in  writeLine (filename: string, ss)
     end
 
