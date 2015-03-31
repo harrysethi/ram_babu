@@ -23,7 +23,7 @@ sig
         LOCATION_value:string, SEQUENCE_param:string, SEQUENCE_value:string,
         SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
         UID_value:string, X_MOZ_GENERATION_param:string,
-        X_MOZ_GENERATION_value:string} list -> unit
+        X_MOZ_GENERATION_value:string} list * string -> unit
         
         val reclist2ical : {CLASS_param:string, CLASS_value:string, CREATED_param:string,
         CREATED_value:string, DESCRIPTION_param:string,
@@ -34,9 +34,9 @@ sig
         LOCATION_value:string, SEQUENCE_param:string, SEQUENCE_value:string,
         SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
         UID_value:string, X_MOZ_GENERATION_param:string,
-        X_MOZ_GENERATION_value:string} list -> unit
+        X_MOZ_GENERATION_value:string} list * string -> unit
         
-        val ical2csv : string -> unit
+        val ical2csv : string * string -> unit
         
         val csv2reclist : string -> {CLASS_param:string, CLASS_value:string, CREATED_param:string,
         CREATED_value:string, DESCRIPTION_param:string,
@@ -341,12 +341,12 @@ struct
                 | reclist2ical_helper (h::t, outputList) = 
                         ( reclist2ical_helper (t,(rec2Fields (h,outputList))) );
          
-         fun reclist2ical [] = ()
-                | reclist2ical (L) = 
+         fun reclist2ical ([], _) = ()
+                | reclist2ical (L, filename:string) = 
                         let
                                 val to_be_written_ics = "BEGIN:VCALENDAR"::"VERSION:2.0"::"PRODID:-//SabreDAV//SabreDAV 1.7.6//EN"::"CALSCALE:GREGORIAN"::(reclist2ical_helper (L,[]));
                         in
-                                FileIO.writeLines("my_cal.ics", to_be_written_ics)
+                                FileIO.writeLines(filename, to_be_written_ics)
                         end;
         
         (*------------------------------------- reclist2csv -------------------------*)
@@ -361,32 +361,23 @@ struct
                 | reclist2csv_helper (h::t) = 
                         (rec2string h) :: (reclist2csv_helper t);
         
-        fun reclist2csv ([]) = ()
-        | reclist2csv (L) = 
+        fun reclist2csv ([],_) = ()
+        | reclist2csv (L, filename:string) = 
                 let 
                         val listOfString = ("\"CLASS-param\",\"CLASS-value\",\"CREATED-param\",\"CREATED-value\",\"DESCRIPTION-param\",\"DESCRIPTION-value\",\"DTEND-param\",\"DTEND-value\",\"DTSTAMP-param\",\"DTSTAMP-value\",\"DTSTART-param\",\"DTSTART-value\",\"LAST-MODIFIED-param\",\"LAST-MODIFIED-value\",\"LOCATION-param\",\"LOCATION-value\",\"SEQUENCE-param\",\"SEQUENCE-value\",\"SUMMARY-param\",\"SUMMARY-value\",\"UID-param\",\"UID-value\",\"X-MOZ-GENERATION-param\",\"X-MOZ-GENERATION-value\"") :: (reclist2csv_helper L);
                 in
-                        FileIO.writeLines("my_cal.csv", listOfString)
+                        FileIO.writeLines(filename, listOfString)
                 end;
                 
                         
         
         
         (*------------------------------------- ical2csv -------------------------*)
-        fun ical2csv (filename:string) = 
+        fun ical2csv (inputFile:string, outputFile:string) = 
                 let
-                        val recList = ical2reclist filename;
+                        val recList = ical2reclist inputFile;
                 in
-                        reclist2csv recList
+                        reclist2csv (recList, outputFile)
                 end;
-                
-       
-       fun ical2ical (filename:string) = 
-                let
-                        val recList = ical2reclist filename;
-                in
-                        reclist2ical recList
-                end;
-		   
 
 end
