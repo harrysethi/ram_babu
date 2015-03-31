@@ -283,13 +283,25 @@ struct
                         in
                                 records
                         end;
-       
+                        
+        fun foldInputList (prev, outL, []) = prev :: outL
+                | foldInputList (prev, outL, h::t) = 
+                        if (String.compare(prev, "") = EQUAL) then
+                              foldInputList (h, outL, t)
+                              
+                        else if ((String.compare(h, "") <> EQUAL) andalso (String.sub(h,0) = #"\t" orelse String.sub(h,0) = #" ")) then
+                                foldInputList (prev ^ substring (h,1,size(h)-1), outL, t)
+                                
+                        else
+                                foldInputList (h, prev::outL , t);
+        
         
 	fun ical2reclist (filename:string) = 
 		let 
 		        val inputList = readFile (filename);
+		        val foldedInputList = rev(foldInputList ("", [], inputList));
 		in 
-		        process_ical2reclist inputList
+		        process_ical2reclist foldedInputList
 		end;
         
          (*------------------------------------- reclist2ical -------------------------*)
