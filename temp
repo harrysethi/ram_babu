@@ -13,7 +13,7 @@ process_ical2reclist(["dwdwdwadwad","BEGIN:VEVENT","UID:98b0dfee46","LAST-MODIFI
  
 
 
-
+		      
 
 
 fun ical2ical (filename:string) = 
@@ -22,3 +22,11 @@ fun ical2ical (filename:string) =
                 in
                         My_ICAL.reclist2ical recList
                 end;
+                
+fun csv2csv (filename:string) = 
+                let
+                        val recList = My_ICAL.csv2reclist filename;
+                in
+                        My_ICAL.reclist2csv recList
+                end;
+                
