@@ -1,6 +1,8 @@
 (*----------------------------------------------------------------------*)
 use "fileIO.sml";
 
+(*--This is a module implementation of "ical & csv translation"--*)
+
 signature MY_ICAL = 
 sig
 	val ical2reclist : string -> {CLASS_param:string, CLASS_value:string, CREATED_param:string,
@@ -97,6 +99,7 @@ struct
                         isCharListEqual_IgnoreCase (s1_list, s2_list)
                 end;
         
+        (*--Compares two strings ignoring case--*)
          fun isStrEqual_IgnoreCase (s1:string, s2:string) = 
                 if (String.size(s1) <> String.size(s2)) then
                         false
@@ -174,7 +177,7 @@ struct
                                 records
                         end;
        
-        
+        (*--Converts the csv specified as filename into a list of event records--*)
 	fun csv2reclist (filename:string) = 
 		let 
 		        val inputList = readFile (filename);
@@ -188,7 +191,8 @@ struct
                 | scan_first_part (h::t,left) = 
                         if (is_found_semicolon_colon h = true) then (implode(rev(left)), h::t)
                         else scan_first_part (t, h::left);
-                
+          
+        (*first_part includes getting the prop_name*)        
         fun first_part str =
                 let
                         val listOfChar = explode(str)
@@ -196,7 +200,7 @@ struct
                         scan_first_part (listOfChar,[])
                 end;
                 
-                
+       (*second_part includes getting the prop_value*)              
        fun second_part [] = ""
                 | second_part (h::t) =
                 if (is_found_colon h = true) then
@@ -222,7 +226,8 @@ struct
                          
                 else
                          scan_third_part (t, h::left, true);
-                                      
+       
+       (*second_part includes getting the param & prop_value*)                                
        fun third_part ([]) =  ("","")
                 | third_part (h::t) = 
                 scan_third_part (t,[],false);
@@ -307,25 +312,26 @@ struct
                         in
                                 records
                         end;
-                        
-        fun foldInputList (prev, outL, []) = prev :: outL
-                | foldInputList (prev, outL, h::t) = 
+
+        (*Unfolds the input lines*)                      
+        fun unfoldInputList (prev, outL, []) = prev :: outL
+                | unfoldInputList (prev, outL, h::t) = 
                         if (isStrEqual_IgnoreCase(prev, "") = true) then
-                              foldInputList (h, outL, t)
+                              unfoldInputList (h, outL, t)
                               
                         else if ((isStrEqual_IgnoreCase(h, "") <> true) andalso (String.sub(h,0) = #"\t" orelse String.sub(h,0) = #" ")) then
-                                foldInputList (prev ^ substring (h,1,size(h)-1), outL, t)
+                                unfoldInputList (prev ^ substring (h,1,size(h)-1), outL, t)
                                 
                         else
-                                foldInputList (h, prev::outL , t);
+                                unfoldInputList (h, prev::outL , t);
         
-        
+        (*--Converts the ical specified as filename into a list of event records--*)
 	fun ical2reclist (filename:string) = 
 		let 
 		        val inputList = readFile (filename);
-		        val foldedInputList = rev(foldInputList ("", [], inputList));
+		        val unfoldedInputList = rev(unfoldInputList ("", [], inputList));
 		in 
-		        process_ical2reclist foldedInputList
+		        process_ical2reclist unfoldedInputList
 		end;
         
          (*------------------------------------- reclist2ical -------------------------*)
@@ -352,6 +358,7 @@ struct
                 end;
                 
          
+         (* used for folding the strings with >75 length*)
          fun foldStringList ([], isFirstLine) = []
                 | foldStringList (h::t, isFirstLine) = 
                         if (isFirstLine = true andalso size(h) > 75) then
@@ -402,6 +409,7 @@ struct
                 | reclist2ical_helper (h::t, outputList) = 
                         ( reclist2ical_helper (t,(rec2Fields (h,outputList))) );
          
+         (*--Converts the record list into an ics file specified by filename--*)
          fun reclist2ical ([], _) = ()
                 | reclist2ical (L, filename:string) = 
                         let
@@ -423,6 +431,7 @@ struct
                 | reclist2csv_helper (h::t) = 
                         (rec2string h) :: (reclist2csv_helper t);
         
+        (*--Converts the record list into a csv file specified by filename--*)
         fun reclist2csv ([],_) = ()
         | reclist2csv (L, filename:string) = 
                 let 
@@ -435,6 +444,8 @@ struct
         
         
         (*------------------------------------- ical2csv -------------------------*)
+        
+        (*--Converts the ical specified by inputFile into a csv file specified by outputFile--*)
         fun ical2csv (inputFile:string, outputFile:string) = 
                 let
                         val recList = ical2reclist inputFile;
