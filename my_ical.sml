@@ -1,4 +1,4 @@
-(*----------------------------------------------------------------------*)
+(*-------------------------- Harinder Pal (2014MCS2123) --------------------------------------------*)
 use "fileIO.sml";
 
 (*--This is a module implementation of "ical & csv translation"--*)
@@ -106,26 +106,39 @@ struct
                 else
                         isStrEqual_IgnoreCase_helper(s1,s2);
         
-        (*------------------------------------- csv2reclist -------------------------*)
+        (*-----------------------------------------------------------------------------
+         --------------------------------- csv2reclist --------------------------------
+         ----------------------------------------------------------------------------*)
         
-        fun getCsvLineAsList ([], left, isInsideInvertedComma) = []
-                | getCsvLineAsList (h::t, left, isInsideInvertedComma) =  
-                        if (isInsideInvertedComma = false andalso is_found_invertedComma h = true) then
-                                getCsvLineAsList (t, left, true)
+        (*- state = 0 => outside of any " .... 1 => inside of one " ... 2=> inside of two " -*)
+        fun getCsvLineAsList ([], left, state) = []
+                | getCsvLineAsList (h::t, left, state) =  
+                        if (state = 0 andalso is_found_invertedComma h = true) then
+                                getCsvLineAsList (t, left, 1)
                                 
-                        else if (isInsideInvertedComma = false andalso is_found_invertedComma h = false) then
-                                getCsvLineAsList (t, [], false)
-                                        
-                        else if (isInsideInvertedComma = true andalso is_found_invertedComma h = true) then
-                                implode(rev(left)) :: getCsvLineAsList (t, [], false)
+                        else if (state = 1 andalso is_found_invertedComma h = false) then
+                                getCsvLineAsList (t, h :: left, 1)
                                 
-                        else 
-                                getCsvLineAsList (t, h::left, true);
+                        else if (state = 1 andalso is_found_invertedComma h = true) then        
+                                getCsvLineAsList (t, left, 2)
+                                
+                        else if (state = 2 andalso is_found_invertedComma h = true) then        
+                                getCsvLineAsList (t, #"\"" :: left, 1)
+                                
+                        else if ((state = 0 orelse state = 2) andalso is_found_invertedComma h = false) then
+                                 if(is_found_comma h = true) then
+                                        implode(rev(left)) :: getCsvLineAsList (t, [], 0)
+                                else 
+                                        getCsvLineAsList (t, [], state)
+                                
+                        else
+                                getCsvLineAsList (t, left, state);
+                                
                 
          
         fun getCsvListOfList ([]) =  []
                 | getCsvListOfList (h::t) = 
-                        (getCsvLineAsList (explode(h), [], false)) :: getCsvListOfList(t);
+                        (getCsvLineAsList (explode(h ^ ","), [], 0)) :: getCsvListOfList(t);
                         
                         
         fun getValues_csv_helper ([], _, _) = "" 
@@ -185,7 +198,9 @@ struct
 		        process_csv2reclist inputList
 		end;
         
-        (*------------------------------------- ical2reclist -------------------------*)
+        (*-----------------------------------------------------------------------------
+         --------------------------------- ical2reclist -------------------------------
+         ----------------------------------------------------------------------------*)
 
         fun scan_first_part ([],left) = (implode(rev(left)),[])
                 | scan_first_part (h::t,left) = 
@@ -230,13 +245,13 @@ struct
        (*second_part includes getting the param & prop_value*)                                
        fun third_part ([]) =  ("","")
                 | third_part (h::t) = 
-                scan_third_part (t,[],false);
+                scan_third_part (t, [], false);
                 
                 
        
        fun getValues ([], _) = ("","")
-                | getValues (L as (h1,h2,h3)::t, keyword) = 
-                        if (isStrEqual_IgnoreCase(h1,keyword) = true) then (h2,h3)
+                | getValues (L as (h1, h2, h3)::t, keyword) = 
+                        if (isStrEqual_IgnoreCase(h1, keyword) = true) then (h2,h3)
                         else getValues (t, keyword);
                 
               
@@ -244,18 +259,18 @@ struct
         fun create_record [] =  empty_record
                 |  create_record (L) = 
                         let
-                                val (dtStartParam, dtStartVal) = getValues(L,"DTSTART");
-                                val (dtEndParam, dtEndVal) = getValues(L,"DTEND");
-                                val (dtStampParam, dtStampVal) = getValues(L,"DTSTAMP");
-                                val (sequenceParam, sequenceVal) = getValues(L,"SEQUENCE");
-                                val (summaryParam, summaryVal) = getValues(L,"SUMMARY");
-                                val (locationParam, locationVal) = getValues(L,"LOCATION");
-                                val (uidParam, uidVal) = getValues(L,"UID");
-                                val (createdParam, createdVal) = getValues(L,"CREATED");
-                                val (lastModifiedParam,lastModifiedVal) = getValues(L,"LAST-MODIFIED");
-                                val (classParam, classVal) = getValues(L,"CLASS");
-                                val (xmozParam, xmozVal) = getValues(L,"X-MOZ-GENERATION");
-                                val (descParam, descVal) = getValues(L,"DESCRIPTION");
+                                val (dtStartParam, dtStartVal) = getValues(L, "DTSTART");
+                                val (dtEndParam, dtEndVal) = getValues(L, "DTEND");
+                                val (dtStampParam, dtStampVal) = getValues(L, "DTSTAMP");
+                                val (sequenceParam, sequenceVal) = getValues(L, "SEQUENCE");
+                                val (summaryParam, summaryVal) = getValues(L, "SUMMARY");
+                                val (locationParam, locationVal) = getValues(L, "LOCATION");
+                                val (uidParam, uidVal) = getValues(L, "UID");
+                                val (createdParam, createdVal) = getValues(L, "CREATED");
+                                val (lastModifiedParam,lastModifiedVal) = getValues(L, "LAST-MODIFIED");
+                                val (classParam, classVal) = getValues(L, "CLASS");
+                                val (xmozParam, xmozVal) = getValues(L, "X-MOZ-GENERATION");
+                                val (descParam, descVal) = getValues(L, "DESCRIPTION");
                         in
                                  {DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}
                         end;
@@ -334,7 +349,9 @@ struct
 		        process_ical2reclist unfoldedInputList
 		end;
         
-         (*------------------------------------- reclist2ical -------------------------*)
+         (*----------------------------------------------------------------------------
+         --------------------------------- reclist2ical -------------------------------
+         ----------------------------------------------------------------------------*)
          
          fun getParam ("") = ""
                 | getParam (param) = 
@@ -419,13 +436,31 @@ struct
                                 FileIO.writeLines(filename, folded_to_be_written)
                         end;
         
-        (*------------------------------------- reclist2csv -------------------------*)
-        
+        (*----------------------------------------------------------------------------
+         --------------------------------- reclist2csv -------------------------------
+         ----------------------------------------------------------------------------*)
+         
+         
+        (* replaces " by ""  .... hic = handleInvertedComma *) 
+        fun hic_helper [] = []
+                | hic_helper (h::t) = 
+                        if(is_found_invertedComma h) then
+                                #"\"" :: #"\"" :: hic_helper (t)
+                        else 
+                                h :: hic_helper (t);
+              
+        fun hic (str) = 
+                let
+                        val charList = hic_helper (String.explode(str));
+                in
+                        String.implode (charList)
+                end;
+                                  
         (*String separator*)
         val ss =  "\"" ^ "," ^ "\"";
 
         fun rec2string ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}) = 
-                ("\"" ^ classParam ^ ss ^ classVal ^ ss ^ createdParam ^ ss ^ createdVal ^ ss ^ descParam ^ ss ^ descVal ^ ss ^ dtEndParam ^ ss ^ dtEndVal ^ ss ^ dtStampParam ^ ss ^ dtStampVal ^ ss ^ dtStartParam ^ ss ^ dtStartVal ^ ss ^ lastModifiedParam ^ ss ^ lastModifiedVal ^ ss ^ locationParam ^ ss ^ locationVal ^ ss ^ sequenceParam ^ ss ^ sequenceVal ^ ss ^ summaryParam ^ ss ^ summaryVal ^ ss ^ uidParam ^ ss ^ uidVal ^ ss ^ xmozParam ^ ss ^ xmozVal ^ "\"");
+                ("\"" ^ hic(classParam) ^ ss ^ hic(classVal) ^ ss ^ hic(createdParam) ^ ss ^ hic(createdVal) ^ ss ^ hic(descParam) ^ ss ^ hic(descVal) ^ ss ^ hic(dtEndParam) ^ ss ^ hic(dtEndVal) ^ ss ^ hic(dtStampParam) ^ ss ^ hic(dtStampVal) ^ ss ^ hic(dtStartParam) ^ ss ^ hic(dtStartVal) ^ ss ^ hic(lastModifiedParam) ^ ss ^ hic(lastModifiedVal) ^ ss ^ hic(locationParam) ^ ss ^ hic(locationVal) ^ ss ^ hic(sequenceParam) ^ ss ^ hic(sequenceVal) ^ ss ^ hic(summaryParam) ^ ss ^ hic(summaryVal) ^ ss ^ hic(uidParam) ^ ss ^ hic(uidVal) ^ ss ^ hic(xmozParam) ^ ss ^ hic(xmozVal) ^ "\"");
         
         fun reclist2csv_helper ([]) = []
                 | reclist2csv_helper (h::t) = 
@@ -440,10 +475,10 @@ struct
                         FileIO.writeLines(filename, listOfString)
                 end;
                 
-                        
         
-        
-        (*------------------------------------- ical2csv -------------------------*)
+        (*----------------------------------------------------------------------------
+         --------------------------------- ical2csv ----------------------------------
+         ----------------------------------------------------------------------------*)
         
         (*--Converts the ical specified by inputFile into a csv file specified by outputFile--*)
         fun ical2csv (inputFile:string, outputFile:string) = 

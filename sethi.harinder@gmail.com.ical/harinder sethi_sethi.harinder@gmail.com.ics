@@ -31,11 +31,12 @@ SUMMARY:Iit Pallavi Sethi Bday
 TRANSP:TRANSPARENT
 
 BEGIN:VALARM
+
 ACTION:EMAIL
 DESCRIPTION:This is an event reminder
 SUMMARY:Alarm notification
-ATTENDEE:mailto:sethi.harinder@gmail.com
 TRIGGER:-P0DT0H30M0S
+
 END:VALARM
 
 
