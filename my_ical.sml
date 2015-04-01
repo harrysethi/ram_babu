@@ -78,6 +78,30 @@ struct
         fun is_found_semicolon_colon c = 
                 if (is_found_semicolon c = true orelse is_found_colon c = true) then true
                 else false;
+                
+                
+        fun isCharListEqual_IgnoreCase ([], []) = true
+                | isCharListEqual_IgnoreCase ([], h_s2::t_s2) = false
+                | isCharListEqual_IgnoreCase (h_s1::t_s1, []) = false                
+                | isCharListEqual_IgnoreCase (h_s1::t_s1, h_s2::t_s2) = 
+                if (Char.compare(Char.toUpper(h_s1), Char.toUpper(h_s2)) = EQUAL) then
+                        isCharListEqual_IgnoreCase (t_s1, t_s2)
+                else
+                        false;
+                
+        fun isStrEqual_IgnoreCase_helper (s1:string, s2:string) = 
+                let
+                        val s1_list = explode(s1);
+                        val s2_list = explode(s2);
+                in
+                        isCharListEqual_IgnoreCase (s1_list, s2_list)
+                end;
+        
+         fun isStrEqual_IgnoreCase (s1:string, s2:string) = 
+                if (String.size(s1) <> String.size(s2)) then
+                        false
+                else
+                        isStrEqual_IgnoreCase_helper(s1,s2);
         
         (*------------------------------------- csv2reclist -------------------------*)
         
@@ -104,7 +128,7 @@ struct
         fun getValues_csv_helper ([], _, _) = "" 
                 | getValues_csv_helper (_, [], _) = ""
                 | getValues_csv_helper (header_h::header_t, row_h::row_t, keyword) = 
-                        if (String.compare(header_h, keyword) = EQUAL) then row_h
+                        if (isStrEqual_IgnoreCase(header_h, keyword) = true) then row_h
                         else getValues_csv_helper (header_t, row_t, keyword);
                 
         fun getValues_csv ([], _, _) = ("", "")
@@ -207,7 +231,7 @@ struct
        
        fun getValues ([], _) = ("","")
                 | getValues (L as (h1,h2,h3)::t, keyword) = 
-                        if (String.compare(h1,keyword) = EQUAL) then (h2,h3)
+                        if (isStrEqual_IgnoreCase(h1,keyword) = true) then (h2,h3)
                         else getValues (t, keyword);
                 
               
@@ -246,7 +270,7 @@ struct
                         val two = second_part(#2 one);
                         val three = third_part(#2 one);
                 in
-                        if (String.compare(two ,"") = EQUAL) then
+                        if (isStrEqual_IgnoreCase(two ,"") = true) then
                                 (#1 one, #1 three, #2 three)
                         else
                                 (#1 one, "", two)
@@ -262,10 +286,10 @@ struct
         
         fun process_lines ([], eventTupleList, isInsideEvent) = []
                 | process_lines (h::t, eventTupleList, isInsideEvent) = 
-                        if (String.compare(h, "BEGIN:VEVENT") = EQUAL) then 
+                        if (isStrEqual_IgnoreCase(h, "BEGIN:VEVENT") = true) then 
                                 process_lines (t, eventTupleList, true)
                                 
-                        else if (String.compare(h, "END:VEVENT") = EQUAL) then 
+                        else if (isStrEqual_IgnoreCase(h, "END:VEVENT") = true) then 
                                 rev(eventTupleList)::process_lines (t, [], false)
                                 
                         else if (isInsideEvent = true) then
@@ -286,10 +310,10 @@ struct
                         
         fun foldInputList (prev, outL, []) = prev :: outL
                 | foldInputList (prev, outL, h::t) = 
-                        if (String.compare(prev, "") = EQUAL) then
+                        if (isStrEqual_IgnoreCase(prev, "") = true) then
                               foldInputList (h, outL, t)
                               
-                        else if ((String.compare(h, "") <> EQUAL) andalso (String.sub(h,0) = #"\t" orelse String.sub(h,0) = #" ")) then
+                        else if ((isStrEqual_IgnoreCase(h, "") <> true) andalso (String.sub(h,0) = #"\t" orelse String.sub(h,0) = #" ")) then
                                 foldInputList (prev ^ substring (h,1,size(h)-1), outL, t)
                                 
                         else
@@ -319,9 +343,9 @@ struct
                         val t_param = getParam param;
                         val t_value = getPropValue value;
                 in
-                        if (String.compare(t_value, "") = EQUAL) then
+                        if (isStrEqual_IgnoreCase(t_value, "") = true) then
                                 L
-                        else if (String.compare(t_param, "") = EQUAL) then
+                        else if (isStrEqual_IgnoreCase(t_param, "") = true) then
                                 (keyword ^ t_value) :: L
                         else 
                                 (keyword ^ t_param ^ t_value) :: L
