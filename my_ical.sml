@@ -14,7 +14,11 @@ sig
         LOCATION_value:string, SEQUENCE_param:string, SEQUENCE_value:string,
         SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
         UID_value:string, X_MOZ_GENERATION_param:string,
-        X_MOZ_GENERATION_value:string} list
+        X_MOZ_GENERATION_value:string, ALARM_ACTION_param:string, 
+        ALARM_ACTION_value:string, ALARM_DESCRIPTION_param:string, 
+        ALARM_DESCRIPTION_value:string, ALARM_SUMMARY_param:string, 
+        ALARM_SUMMARY_value:string, ALARM_TRIGGER_param:string, 
+        ALARM_TRIGGER_value:string} list
         
         val reclist2csv : {CLASS_param:string, CLASS_value:string, CREATED_param:string,
         CREATED_value:string, DESCRIPTION_param:string,
@@ -25,7 +29,11 @@ sig
         LOCATION_value:string, SEQUENCE_param:string, SEQUENCE_value:string,
         SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
         UID_value:string, X_MOZ_GENERATION_param:string,
-        X_MOZ_GENERATION_value:string} list * string -> unit
+        X_MOZ_GENERATION_value:string, ALARM_ACTION_param:string, 
+        ALARM_ACTION_value:string, ALARM_DESCRIPTION_param:string, 
+        ALARM_DESCRIPTION_value:string, ALARM_SUMMARY_param:string, 
+        ALARM_SUMMARY_value:string, ALARM_TRIGGER_param:string, 
+        ALARM_TRIGGER_value:string} list * string -> unit
         
         val reclist2ical : {CLASS_param:string, CLASS_value:string, CREATED_param:string,
         CREATED_value:string, DESCRIPTION_param:string,
@@ -36,7 +44,11 @@ sig
         LOCATION_value:string, SEQUENCE_param:string, SEQUENCE_value:string,
         SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
         UID_value:string, X_MOZ_GENERATION_param:string,
-        X_MOZ_GENERATION_value:string} list * string -> unit
+        X_MOZ_GENERATION_value:string, ALARM_ACTION_param:string, 
+        ALARM_ACTION_value:string, ALARM_DESCRIPTION_param:string, 
+        ALARM_DESCRIPTION_value:string, ALARM_SUMMARY_param:string, 
+        ALARM_SUMMARY_value:string, ALARM_TRIGGER_param:string, 
+        ALARM_TRIGGER_value:string} list * string -> unit
         
         val ical2csv : string * string -> unit
         
@@ -49,7 +61,11 @@ sig
         LOCATION_value:string, SEQUENCE_param:string, SEQUENCE_value:string,
         SUMMARY_param:string, SUMMARY_value:string, UID_param:string,
         UID_value:string, X_MOZ_GENERATION_param:string,
-        X_MOZ_GENERATION_value:string} list
+        X_MOZ_GENERATION_value:string, ALARM_ACTION_param:string, 
+        ALARM_ACTION_value:string, ALARM_DESCRIPTION_param:string, 
+        ALARM_DESCRIPTION_value:string, ALARM_SUMMARY_param:string, 
+        ALARM_SUMMARY_value:string, ALARM_TRIGGER_param:string, 
+        ALARM_TRIGGER_value:string} list
         
        
 end  (* sig ICAL *)
@@ -57,7 +73,7 @@ end  (* sig ICAL *)
 structure My_ICAL: MY_ICAL =
 struct
 
-        val empty_record = {DTSTART_param="", DTSTART_value="", DTEND_param="", DTEND_value="", DTSTAMP_param="", DTSTAMP_value="", SEQUENCE_param="", SEQUENCE_value="", SUMMARY_param="", SUMMARY_value="", LOCATION_param="", LOCATION_value="", UID_param="", UID_value="", CREATED_param="", CREATED_value="", LAST_MODIFIED_param="", LAST_MODIFIED_value="", CLASS_param="", CLASS_value="", X_MOZ_GENERATION_param="", X_MOZ_GENERATION_value="", DESCRIPTION_param="", DESCRIPTION_value=""};
+        val empty_record = {DTSTART_param="", DTSTART_value="", DTEND_param="", DTEND_value="", DTSTAMP_param="", DTSTAMP_value="", SEQUENCE_param="", SEQUENCE_value="", SUMMARY_param="", SUMMARY_value="", LOCATION_param="", LOCATION_value="", UID_param="", UID_value="", CREATED_param="", CREATED_value="", LAST_MODIFIED_param="", LAST_MODIFIED_value="", CLASS_param="", CLASS_value="", X_MOZ_GENERATION_param="", X_MOZ_GENERATION_value="", DESCRIPTION_param="", DESCRIPTION_value="", ALARM_ACTION_param="", ALARM_ACTION_value="", ALARM_DESCRIPTION_param="", ALARM_DESCRIPTION_value="", ALARM_SUMMARY_param="", ALARM_SUMMARY_value="", ALARM_TRIGGER_param="", ALARM_TRIGGER_value=""};
 
         fun readFile (filename:string) = 
                 FileIO.readLines (filename);
@@ -169,8 +185,12 @@ struct
                                 val (classParam, classVal) = getValues_csv(header, row, "CLASS");
                                 val (xmozParam, xmozVal) = getValues_csv(header, row, "X-MOZ-GENERATION");
                                 val (descParam, descVal) = getValues_csv(header, row, "DESCRIPTION");
+                                val (alarm_actionParam, alarm_actionVal) = getValues_csv(header, row, "ALARM-ACTION");
+                                val (alarm_descParam, alarm_descVal) = getValues_csv(header, row, "ALARM-DESCRIPTION");
+                                val (alarm_summaryParam, alarm_summaryVal) = getValues_csv(header, row, "ALARM-SUMMARY");
+                                val (alarm_triggerParam, alarm_triggerVal) = getValues_csv(header, row, "ALARM-TRIGGER");
                         in
-                                 {DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}
+                                 {DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal, ALARM_ACTION_param=alarm_actionParam, ALARM_ACTION_value=alarm_actionVal, ALARM_DESCRIPTION_param=alarm_descParam, ALARM_DESCRIPTION_value=alarm_descVal, ALARM_SUMMARY_param=alarm_summaryParam, ALARM_SUMMARY_value=alarm_summaryVal, ALARM_TRIGGER_param=alarm_triggerParam, ALARM_TRIGGER_value=alarm_triggerVal}
                         end;
                 
         
@@ -271,8 +291,12 @@ struct
                                 val (classParam, classVal) = getValues(L, "CLASS");
                                 val (xmozParam, xmozVal) = getValues(L, "X-MOZ-GENERATION");
                                 val (descParam, descVal) = getValues(L, "DESCRIPTION");
+                                val (alarm_actionParam, alarm_actionVal) = getValues(L, "ALARM-ACTION");
+                                val (alarm_descParam, alarm_descVal) = getValues(L, "ALARM-DESCRIPTION");
+                                val (alarm_summaryParam, alarm_summaryVal) = getValues(L, "ALARM-SUMMARY");
+                                val (alarm_triggerParam, alarm_triggerVal) = getValues(L, "ALARM-TRIGGER");
                         in
-                                 {DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}
+                                 {DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal, ALARM_ACTION_param=alarm_actionParam, ALARM_ACTION_value=alarm_actionVal, ALARM_DESCRIPTION_param=alarm_descParam, ALARM_DESCRIPTION_value=alarm_descVal, ALARM_SUMMARY_param=alarm_summaryParam, ALARM_SUMMARY_value=alarm_summaryVal, ALARM_TRIGGER_param=alarm_triggerParam, ALARM_TRIGGER_value=alarm_triggerVal}
                         end;
                 
         
@@ -283,46 +307,57 @@ struct
                 
        
        
-       fun process_line ("") = ("","","")
-                | process_line (line) = 
+       fun process_line ("", _) = ("", "", "")
+                | process_line (line, isInsideAlarm) = 
                 let 
                         val one = first_part(line);
                         val two = second_part(#2 one);
                         val three = third_part(#2 one);
                 in
-                        if (isStrEqual_IgnoreCase(two ,"") = true) then
+                        if (isInsideAlarm = false andalso isStrEqual_IgnoreCase(two, "") = true) then
                                 (#1 one, #1 three, #2 three)
-                        else
+                                
+                        else if (isInsideAlarm = false andalso isStrEqual_IgnoreCase(two, "") = false) then
                                 (#1 one, "", two)
+                                
+                        else if (isInsideAlarm = true andalso isStrEqual_IgnoreCase(two, "") = true) then
+                                ("ALARM-" ^ (#1 one), #1 three, #2 three)
+                                
+                        else if (isInsideAlarm = true andalso isStrEqual_IgnoreCase(two, "") = false) then
+                                ("ALARM-" ^ (#1 one), "", two)
+                                
+                        else ("", "", "")
                 end;
                 
-                
-       fun process_lines_event [] = []
-                | process_lines_event (h::t) = 
-                        process_line(h)::process_lines_event(t);
         
-        
-        
-        
-        fun process_lines ([], eventTupleList, isInsideEvent) = []
-                | process_lines (h::t, eventTupleList, isInsideEvent) = 
-                        if (isStrEqual_IgnoreCase(h, "BEGIN:VEVENT") = true) then 
-                                process_lines (t, eventTupleList, true)
+        fun process_lines ([], eventTupleList, isInsideEvent, isInsideAlarm) = []
+                | process_lines (h::t, eventTupleList, isInsideEvent, isInsideAlarm) = 
+                        if (isInsideEvent = false andalso isInsideAlarm = false andalso isStrEqual_IgnoreCase(h, "BEGIN:VEVENT") = true) then 
+                                process_lines (t, eventTupleList, true, false)
+                        
+                        else if (isInsideEvent = true andalso isInsideAlarm = false andalso isStrEqual_IgnoreCase(h, "BEGIN:VALARM") = true) then 
+                                process_lines (t, eventTupleList, true, true)
                                 
-                        else if (isStrEqual_IgnoreCase(h, "END:VEVENT") = true) then 
-                                rev(eventTupleList)::process_lines (t, [], false)
+                        else if (isInsideEvent = true andalso isInsideAlarm = true andalso isStrEqual_IgnoreCase(h, "END:VALARM") = true) then 
+                                process_lines (t, eventTupleList, true, false)
                                 
-                        else if (isInsideEvent = true) then
-                              process_lines (t, process_line(h)::eventTupleList, true)
+                        else if (isInsideEvent = true andalso isInsideAlarm = false andalso isStrEqual_IgnoreCase(h, "END:VEVENT") = true) then 
+                                rev(eventTupleList)::process_lines (t, [], false, false)
+                                
+                        else if (isInsideEvent = true andalso isInsideAlarm = false) then
+                                process_lines (t, process_line(h, false) :: eventTupleList, true, false)
+                              
+                        else if (isInsideEvent = true andalso isInsideAlarm = true) then
+                                process_lines (t, process_line(h, true) :: eventTupleList, true, true)
                               
                         else
-                                process_lines (t, eventTupleList, false);
+                                process_lines (t, eventTupleList, false, false);
                                 
                                 
         fun process_ical2reclist ([]) = []
                 | process_ical2reclist (L) = 
                         let
-                                val listOfListOfTuples = process_lines (L, [], false);
+                                val listOfListOfTuples = process_lines (L, [], false, false);
                                 val records = create_records listOfListOfTuples;
                         in
                                 records
@@ -361,6 +396,23 @@ struct
                 | getPropValue (propValue) = 
                         ":" ^ propValue;
                         
+                        
+         fun getKeywordForAlarm (keyword_in) = 
+                if(isStrEqual_IgnoreCase(keyword_in, "ALARM-ACTION") = true) then
+                        "ACTION"
+                        
+                else if(isStrEqual_IgnoreCase(keyword_in, "ALARM-DESCRIPTION") = true) then
+                        "DESCRIPTION"
+                        
+                else if(isStrEqual_IgnoreCase(keyword_in, "ALARM-SUMMARY") = true) then
+                        "SUMMARY"
+                        
+                else if(isStrEqual_IgnoreCase(keyword_in, "ALARM-TRIGGER") = true) then
+                        "TRIGGER"
+                        
+                else 
+                        keyword_in;
+                        
          fun getLineString_Helper (keyword, param, value, L) = 
                 let 
                         val t_param = getParam param;
@@ -369,12 +421,20 @@ struct
                         if (isStrEqual_IgnoreCase(t_value, "") = true) then
                                 L
                         else if (isStrEqual_IgnoreCase(t_param, "") = true) then
-                                (keyword ^ t_value) :: L
+                                (getKeywordForAlarm(keyword) ^ t_value) :: L
                         else 
-                                (keyword ^ t_param ^ t_value) :: L
+                                (getKeywordForAlarm(keyword) ^ t_param ^ t_value) :: L
                 end;
                 
-         
+                
+         fun getLineString (keyword, param, value, L) = 
+                let
+                        val lineString = getLineString_Helper (keyword, param, value, L);
+                in
+                        lineString                                
+                end;
+                
+                
          (* used for folding the strings with >75 length*)
          fun foldStringList ([], isFirstLine) = []
                 | foldStringList (h::t, isFirstLine) = 
@@ -391,17 +451,9 @@ struct
                         else
                                 h :: foldStringList (t, true);
                                 
-                                
-         
-         fun getLineString (keyword, param, value, L) = 
-                let
-                        val lineString = getLineString_Helper (keyword, param, value, L);
-                in
-                        lineString                                
-                end;
                         
          
-         fun rec2Fields ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}, outputList) = 
+         fun rec2Fields ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal, ALARM_ACTION_param=alarm_actionParam, ALARM_ACTION_value=alarm_actionVal, ALARM_DESCRIPTION_param=alarm_descParam, ALARM_DESCRIPTION_value=alarm_descVal, ALARM_SUMMARY_param=alarm_summaryParam, ALARM_SUMMARY_value=alarm_summaryVal, ALARM_TRIGGER_param=alarm_triggerParam, ALARM_TRIGGER_value=alarm_triggerVal}, outputList) = 
                 let 
                         val L1 = "BEGIN:VEVENT" :: outputList;
                         val L2 = getLineString ("DTSTART", dtStartParam, dtStartVal, L1);
@@ -415,7 +467,13 @@ struct
                         val L10 = getLineString ("LAST-MODIFIED", lastModifiedParam, lastModifiedVal, L9);
                         val L11 = getLineString ("CLASS", classParam, classVal, L10);
                         val L12 = getLineString ("X-MOZ-GENERATION", xmozParam, xmozVal, L11);
-                        val L_final = getLineString ("DESCRIPTION", descParam, descVal, L12);
+                        val L13 = getLineString ("DESCRIPTION", descParam, descVal, L12);
+                        val L14 = "BEGIN:VALARM" :: L13;
+                        val L15 = getLineString ("ALARM-ACTION", alarm_actionParam, alarm_actionVal, L14);
+                        val L16 = getLineString ("ALARM-DESCRIPTION", alarm_descParam, alarm_descVal, L15);
+                        val L17 = getLineString ("ALARM-SUMMARY", alarm_summaryParam, alarm_summaryVal, L16);
+                        val L18 = getLineString ("ALARM-TRIGGER", alarm_triggerParam, alarm_triggerVal, L17);
+                        val L_final = "END:VALARM" :: L18;
                 in
                         "END:VEVENT"::L_final
                 end;
@@ -459,8 +517,8 @@ struct
         (*String separator*)
         val ss =  "\"" ^ "," ^ "\"";
 
-        fun rec2string ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal}) = 
-                ("\"" ^ hic(classParam) ^ ss ^ hic(classVal) ^ ss ^ hic(createdParam) ^ ss ^ hic(createdVal) ^ ss ^ hic(descParam) ^ ss ^ hic(descVal) ^ ss ^ hic(dtEndParam) ^ ss ^ hic(dtEndVal) ^ ss ^ hic(dtStampParam) ^ ss ^ hic(dtStampVal) ^ ss ^ hic(dtStartParam) ^ ss ^ hic(dtStartVal) ^ ss ^ hic(lastModifiedParam) ^ ss ^ hic(lastModifiedVal) ^ ss ^ hic(locationParam) ^ ss ^ hic(locationVal) ^ ss ^ hic(sequenceParam) ^ ss ^ hic(sequenceVal) ^ ss ^ hic(summaryParam) ^ ss ^ hic(summaryVal) ^ ss ^ hic(uidParam) ^ ss ^ hic(uidVal) ^ ss ^ hic(xmozParam) ^ ss ^ hic(xmozVal) ^ "\"");
+        fun rec2string ({DTSTART_param=dtStartParam, DTSTART_value=dtStartVal, DTEND_param=dtEndParam, DTEND_value=dtEndVal, DTSTAMP_param=dtStampParam, DTSTAMP_value=dtStampVal, SEQUENCE_param=sequenceParam, SEQUENCE_value=sequenceVal, SUMMARY_param=summaryParam, SUMMARY_value=summaryVal, LOCATION_param=locationParam, LOCATION_value=locationVal, UID_param=uidParam, UID_value=uidVal, CREATED_param=createdParam, CREATED_value=createdVal, LAST_MODIFIED_param=lastModifiedParam, LAST_MODIFIED_value=lastModifiedVal, CLASS_param=classParam, CLASS_value=classVal, X_MOZ_GENERATION_param=xmozParam, X_MOZ_GENERATION_value=xmozVal, DESCRIPTION_param=descParam, DESCRIPTION_value=descVal, ALARM_ACTION_param=alarm_actionParam, ALARM_ACTION_value=alarm_actionVal, ALARM_DESCRIPTION_param=alarm_descParam, ALARM_DESCRIPTION_value=alarm_descVal, ALARM_SUMMARY_param=alarm_summaryParam, ALARM_SUMMARY_value=alarm_summaryVal, ALARM_TRIGGER_param=alarm_triggerParam, ALARM_TRIGGER_value=alarm_triggerVal}) = 
+                ("\"" ^ hic(classParam) ^ ss ^ hic(classVal) ^ ss ^ hic(createdParam) ^ ss ^ hic(createdVal) ^ ss ^ hic(descParam) ^ ss ^ hic(descVal) ^ ss ^ hic(dtEndParam) ^ ss ^ hic(dtEndVal) ^ ss ^ hic(dtStampParam) ^ ss ^ hic(dtStampVal) ^ ss ^ hic(dtStartParam) ^ ss ^ hic(dtStartVal) ^ ss ^ hic(lastModifiedParam) ^ ss ^ hic(lastModifiedVal) ^ ss ^ hic(locationParam) ^ ss ^ hic(locationVal) ^ ss ^ hic(sequenceParam) ^ ss ^ hic(sequenceVal) ^ ss ^ hic(summaryParam) ^ ss ^ hic(summaryVal) ^ ss ^ hic(uidParam) ^ ss ^ hic(uidVal) ^ ss ^ hic(xmozParam) ^ ss ^ hic(xmozVal) ^ ss ^ hic(alarm_actionParam) ^ ss ^ hic(alarm_actionVal) ^ ss ^ hic(alarm_descParam) ^ ss ^ hic(alarm_descVal) ^ ss ^ hic(alarm_summaryParam) ^ ss ^ hic(alarm_summaryVal) ^ ss ^ hic(alarm_triggerParam) ^ ss ^ hic(alarm_triggerVal) ^ "\"");
         
         fun reclist2csv_helper ([]) = []
                 | reclist2csv_helper (h::t) = 
@@ -470,12 +528,11 @@ struct
         fun reclist2csv ([],_) = ()
         | reclist2csv (L, filename:string) = 
                 let 
-                        val listOfString = ("\"CLASS-param\",\"CLASS-value\",\"CREATED-param\",\"CREATED-value\",\"DESCRIPTION-param\",\"DESCRIPTION-value\",\"DTEND-param\",\"DTEND-value\",\"DTSTAMP-param\",\"DTSTAMP-value\",\"DTSTART-param\",\"DTSTART-value\",\"LAST-MODIFIED-param\",\"LAST-MODIFIED-value\",\"LOCATION-param\",\"LOCATION-value\",\"SEQUENCE-param\",\"SEQUENCE-value\",\"SUMMARY-param\",\"SUMMARY-value\",\"UID-param\",\"UID-value\",\"X-MOZ-GENERATION-param\",\"X-MOZ-GENERATION-value\"") :: (reclist2csv_helper L);
+                        val listOfString = ("\"CLASS-param\",\"CLASS-value\",\"CREATED-param\",\"CREATED-value\",\"DESCRIPTION-param\",\"DESCRIPTION-value\",\"DTEND-param\",\"DTEND-value\",\"DTSTAMP-param\",\"DTSTAMP-value\",\"DTSTART-param\",\"DTSTART-value\",\"LAST-MODIFIED-param\",\"LAST-MODIFIED-value\",\"LOCATION-param\",\"LOCATION-value\",\"SEQUENCE-param\",\"SEQUENCE-value\",\"SUMMARY-param\",\"SUMMARY-value\",\"UID-param\",\"UID-value\",\"X-MOZ-GENERATION-param\",\"X-MOZ-GENERATION-value\",\"ALARM-ACTION-param\",\"ALARM-ACTION-value\",\"ALARM-DESCRIPTION-param\",\"ALARM-DESCRIPTION-value\",\"ALARM-SUMMARY-param\",\"ALARM-SUMMARY-value\",\"ALARM-TRIGGER-param\",\"ALARM-TRIGGER-value\"") :: (reclist2csv_helper L);
                 in
                         FileIO.writeLines(filename, listOfString)
                 end;
                 
-        
         (*----------------------------------------------------------------------------
          --------------------------------- ical2csv ----------------------------------
          ----------------------------------------------------------------------------*)
