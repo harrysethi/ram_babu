@@ -5,15 +5,15 @@
 It provides the following functions:
 
 <ul>
-<li><i>ical2reclist</i>: Parses events from the input iCalender file. Output is a list of records, where each record is a calender event.
+<li><i>ical2reclist</i>: Parses events from the input iCalender file. Output is a list of records, where each record is a calender event.</li>
 
-<li><i>csv2reclist</i>: Parses events from the input CSV file. Output is a list of records, where each record is a calender event.
+<li><i>csv2reclist</i>: Parses events from the input CSV file. Output is a list of records, where each record is a calender event.</li>
 
-<li><i>reclist2ical</i>: Given an input list of event records, writes the events in iCalender format to an output file.
+<li><i>reclist2ical</i>: Given an input list of event records, writes the events in iCalender format to an output file.</li>
 
-<li><i>reclist2csv</i>: Given an input list of event records, writes them in CSV format to an output file.
+<li><i>reclist2csv</i>: Given an input list of event records, writes them in CSV format to an output file.</li>
 
-<li><i>ical2csv</i>: Converts the events given in iCalender format from the input file to CSV format and writes the result to an output file.
+<li><i>ical2csv</i>: Converts the events given in iCalender format from the input file to CSV format and writes the result to an output file.</li>
 </ul>
 
 RUNNING <i>ram_babu</i>
